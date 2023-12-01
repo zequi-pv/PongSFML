@@ -30,7 +30,7 @@ Sprite padTwoSprite;
 Sprite fieldSprite;
 Sprite pauseMenuSprite;
 
-static void init(RenderWindow& window, Ball& ball, Pad& rectangle1, Pad& rectangle2);
+static void init(Ball& ball, Pad& rectangle1, Pad& rectangle2);
 static void initTextures(Texture& texBall, Texture& texPadOne, Texture& texPadTwo,
 	Texture& texField, Texture& textMenuPause);
 static void initFont(Font font);
@@ -38,10 +38,10 @@ static void initSprites(Texture& texBall, Texture& texPadOne, Texture& texPadTwo
 	Texture& texField, Texture& textMenuPause);
 static void pausedGame(Keyboard keyboard, bool& pause, GameScreen& currentScreen, Pad& rectangle1, Pad& rectangle2, Ball& ball, bool& gameOver);
 static void resetGame(Pad& rectangle1, Pad& rectangle2, Ball& ball, bool& gameOver);
-static void drawField(RenderWindow& window);
-static void drawObjects(RenderWindow& window, Ball ball, Pad rectangle1, Pad rectangle2);
-static void drawGame(RenderWindow& window, Ball& ball, Pad& rectangle1, Pad& rectangle2, bool pause, int winPoints);
-static void drawRules(RenderWindow& window);
+static void drawField();
+static void drawObjects(Ball ball, Pad rectangle1, Pad rectangle2);
+static void drawGame(Ball& ball, Pad& rectangle1, Pad& rectangle2, bool pause, int winPoints);
+static void drawRules();
 static void returnToMenu(GameScreen& currentScreen, Pad& rectangle1, Pad& rectangle2, Ball& ball, bool& gameOver);
 static void inputsSingle(Time& dt, Keyboard keyboard, Pad& rectangle1);
 static void updateSingleplayer(Time& dt, Keyboard keyboard, Ball& ball, Pad& rectangle1, Pad& rectangle2, GameScreen& currentScreen,
@@ -50,11 +50,11 @@ static void inputsMulti(Time& dt, Keyboard keyboard, Pad& rectangle1, Pad& recta
 static void updateMultiplayer(Time& dt, Keyboard keyboard, Ball& ball, Pad& rectangle1, Pad& rectangle2, GameScreen& currentScreen,
 	bool& gameOver, int winPoints, bool& pause, int& currentOption);
 
+RenderWindow* window;
+
 void runGame()
 {
 	srand(static_cast<unsigned int>(time(NULL)));
-
-	RenderWindow window;
 
 	Clock clock;
 
@@ -90,7 +90,7 @@ void runGame()
 
 	GameScreen currentScreen = MENU;
 
-	init(window, ball, rectangle1, rectangle2);
+	init(ball, rectangle1, rectangle2);
 	initTextures(texBall, texPadOne, texPadTwo, texField, textMenuPause);
 	initFont(font);
 	initSprites(texBall, texPadOne, texPadTwo, texField, textMenuPause);
@@ -109,7 +109,7 @@ void runGame()
 	bool pause = false;
 	bool isGameRunning = true;
 
-	while (window.isOpen() && isGameRunning)
+	while (window->isOpen() && isGameRunning)
 	{
 		dt = clock.restart();
 
@@ -208,7 +208,7 @@ void runGame()
 			slSetTextAlign(SL_ALIGN_CENTER);
 			slSetForeColor(1, 1, 1, 1);*/
 
-			drawField(window);
+			drawField();
 
 			title1.setCharacterSize(50);
 			title1.setFillColor(Color::Blue);
@@ -298,16 +298,16 @@ void runGame()
 
 			break;
 		case SINGLEPLAYER:
-			window.clear(Color::White);
-			drawGame(window, ball, rectangle1, rectangle2, pause, winPoints);
+			window->clear(Color::White);
+			drawGame(ball, rectangle1, rectangle2, pause, winPoints);
 			break;
 		case MULTIPLAYER:
-			window.clear(Color::White);
-			drawGame(window, ball, rectangle1, rectangle2, pause, winPoints);
+			window->clear(Color::White);
+			drawGame(ball, rectangle1, rectangle2, pause, winPoints);
 			break;
 		case RULES:
-			window.clear(Color::White);
-			drawRules(window);
+			window->clear(Color::White);
+			drawRules();
 			break;
 		case CREDITS:
 			//slText(170, 20, "Made by Ezequiel Prieto"); credits
@@ -318,10 +318,10 @@ void runGame()
 			break;
 		}
 
-		window.display();
+		window->display();
 	}
 
-	window.close();
+	window->close();
 }
 
 int GetScreenWidth()
@@ -400,12 +400,14 @@ void ResetBall(Ball& ball)
 	}
 }
 
-void init(RenderWindow& window, Ball& ball, Pad& rectangle1, Pad& rectangle2)
+void init(Ball& ball, Pad& rectangle1, Pad& rectangle2)
 {
+	window = new RenderWindow();
+
 	const int screenWidth = 800;
 	const int screenHeight = 450;
 
-	window.create(sf::VideoMode(screenWidth, screenHeight), "Pong with SFML");
+	window->create(sf::VideoMode(screenWidth, screenHeight), "Pong with SFML");
 
 	initBall(ball);
 
@@ -465,29 +467,29 @@ void inputsMulti(Time& dt, Keyboard keyboard, Pad& rectangle1, Pad& rectangle2)
 	if (keyboard.isKeyPressed(Keyboard::Down)) rectangle2.y += 250.0f * dt.asSeconds();
 }
 
-void drawField(RenderWindow& window)
+void drawField()
 {
 	fieldSprite.setPosition(0.0f, 0.0f);
 	fieldSprite.setScale(1.0f, 1.0f);
-	window.draw(fieldSprite);
+	window->draw(fieldSprite);
 }
 
-void drawObjects(RenderWindow& window, Ball ball, Pad rectangle1, Pad rectangle2)
+void drawObjects(Ball ball, Pad rectangle1, Pad rectangle2)
 {
 	ballSprite.setPosition(ball.x, ball.y);
 	ballSprite.setScale(1.0f, 1.0f);
-	window.draw(ballSprite);
+	window->draw(ballSprite);
 
 	padOneSprite.setPosition(rectangle1.x, rectangle1.y);
 	padOneSprite.setScale(1.0f, 1.0f);
-	window.draw(padOneSprite);
+	window->draw(padOneSprite);
 
 	padTwoSprite.setPosition(rectangle2.x, rectangle2.y);
 	padTwoSprite.setScale(1.0f, 1.0f);
-	window.draw(padTwoSprite);
+	window->draw(padTwoSprite);
 }
 
-void drawGame(RenderWindow& window, Ball& ball, Pad& rectangle1, Pad& rectangle2, bool pause, int winPoints)
+void drawGame(Ball& ball, Pad& rectangle1, Pad& rectangle2, bool pause, int winPoints)
 {
 	string textPoints1 = to_string(rectangle1.score);
 	string textPoints2 = to_string(rectangle2.score);
@@ -524,9 +526,9 @@ void drawGame(RenderWindow& window, Ball& ball, Pad& rectangle1, Pad& rectangle2
 	returnTomenuKey.setPosition(20, 20);
 	returnTomenuKey.setString("Press BackSpace to pause");
 
-	drawField(window);
+	drawField();
 
-	drawObjects(window, ball, rectangle1, rectangle2);
+	drawObjects(ball, rectangle1, rectangle2);
 
 	if (rectangle1.score == winPoints)
 	{
@@ -585,7 +587,7 @@ void drawGame(RenderWindow& window, Ball& ball, Pad& rectangle1, Pad& rectangle2
 	}
 }
 
-void drawRules(RenderWindow& window)
+void drawRules()
 {
 	Text rules1;
 	Text rules2;
@@ -596,7 +598,7 @@ void drawRules(RenderWindow& window)
 
 	/*slSetBackColor(0.0, 0.0, 0.0);*/
 
-	drawField(window);
+	drawField();
 
 	rules1.setCharacterSize(20);
 	rules1.setFillColor(Color::White);
