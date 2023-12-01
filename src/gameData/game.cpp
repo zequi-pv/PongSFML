@@ -252,7 +252,6 @@ void runGame()
 			exit.setString("EXIT");
 
 
-
 			/*slText(600, 80, "Use the up and down keys ");
 			slText(600, 50, "to move through the menu!");
 
@@ -450,41 +449,41 @@ void initFont(Font font)
 
 void inputsSingle(Time& dt, Keyboard keyboard, Pad& rectangle1)
 {
-	if (keyboard.isKeyPressed(Keyboard::S)) rectangle1.y -= 250.0f * dt.asSeconds();
+	if (keyboard.isKeyPressed(Keyboard::W)) rectangle1.y -= 250.0f * dt.asSeconds();
 
-	if (keyboard.isKeyPressed(Keyboard::W)) rectangle1.y += 250.0f * dt.asSeconds();
+	if (keyboard.isKeyPressed(Keyboard::S)) rectangle1.y += 250.0f * dt.asSeconds();
 }
 
 void inputsMulti(Time& dt, Keyboard keyboard, Pad& rectangle1, Pad& rectangle2)
 {
-	if (keyboard.isKeyPressed(Keyboard::S)) rectangle1.y -= 250.0f * dt.asSeconds();
+	if (keyboard.isKeyPressed(Keyboard::W)) rectangle1.y -= 250.0f * dt.asSeconds();
 
-	if (keyboard.isKeyPressed(Keyboard::W)) rectangle1.y += 250.0f * dt.asSeconds();
+	if (keyboard.isKeyPressed(Keyboard::S)) rectangle1.y += 250.0f * dt.asSeconds();
 
-	if (keyboard.isKeyPressed(Keyboard::Down)) rectangle2.y -= 250.0f * dt.asSeconds();
+	if (keyboard.isKeyPressed(Keyboard::Up)) rectangle2.y -= 250.0f * dt.asSeconds();
 
-	if (keyboard.isKeyPressed(Keyboard::Up)) rectangle2.y += 250.0f * dt.asSeconds();
+	if (keyboard.isKeyPressed(Keyboard::Down)) rectangle2.y += 250.0f * dt.asSeconds();
 }
 
 void drawField(RenderWindow& window)
 {
-	fieldSprite.setPosition(400.0f, 225.0f);
-	fieldSprite.setScale(800.0f, 450.0f);
+	fieldSprite.setPosition(0.0f, 0.0f);
+	fieldSprite.setScale(1.0f, 1.0f);
 	window.draw(fieldSprite);
 }
 
 void drawObjects(RenderWindow& window, Ball ball, Pad rectangle1, Pad rectangle2)
 {
 	ballSprite.setPosition(ball.x, ball.y);
-	ballSprite.setScale(static_cast<float>(ball.width), static_cast<float>(ball.height));
+	ballSprite.setScale(1.0f, 1.0f);
 	window.draw(ballSprite);
 
 	padOneSprite.setPosition(rectangle1.x, rectangle1.y);
-	padOneSprite.setScale(static_cast<float>(rectangle1.width), static_cast<float>(rectangle1.height));
+	padOneSprite.setScale(1.0f, 1.0f);
 	window.draw(padOneSprite);
 
 	padTwoSprite.setPosition(rectangle2.x, rectangle2.y);
-	padTwoSprite.setScale(static_cast<float>(rectangle2.width), static_cast<float>(rectangle2.height));
+	padTwoSprite.setScale(1.0f, 1.0f);
 	window.draw(padTwoSprite);
 }
 
