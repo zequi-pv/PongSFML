@@ -69,6 +69,7 @@ namespace pong
 	static void updateMultiplayer(Time& dt, Keyboard keyboard, Ball& ball, Pad& rectangle1, Pad& rectangle2, GameScreen& currentScreen,
 		bool& gameOver, int winPoints, bool& pause, int& currentOption);
 	void drawText(Text text);
+	void drawCredits();
 	/*bool optionsCollision(RectangleShape buttonRect, Mouse mouse);
 	void buttonIsSelected(Button& button, RectangleShape buttonRect, Mouse mouse);*/
 	void close();
@@ -204,6 +205,13 @@ namespace pong
 
 					}
 					break;
+				case CREDITS:
+					if (keyboard.isKeyPressed(Keyboard::Enter))
+					{
+						currentScreen = GameScreen::CREDITS;
+
+					}
+					break;
 				case EXIT:
 					if (keyboard.isKeyPressed(Keyboard::Enter))
 					{
@@ -221,6 +229,12 @@ namespace pong
 				updateMultiplayer(dt, keyboard, ball, rectangle1, rectangle2, currentScreen, gameOver, winPoints, pause, currentOption);
 				break;
 			case RULES:
+				if (keyboard.isKeyPressed(Keyboard::Escape))
+				{
+					currentScreen = GameScreen::MENU;
+				}
+				break;
+			case CREDITS:
 				if (keyboard.isKeyPressed(Keyboard::Escape))
 				{
 					currentScreen = GameScreen::MENU;
@@ -373,7 +387,8 @@ namespace pong
 				drawRules();
 				break;
 			case CREDITS:
-				//slText(170, 20, "Made by Ezequiel Prieto"); credits
+				window->clear(Color::White);
+				drawCredits();
 				break;
 			case EXIT:
 				break;
@@ -401,6 +416,13 @@ namespace pong
 
 	void pausedGame(Keyboard keyboard, bool& pause, GameScreen& currentScreen, Pad& rectangle1, Pad& rectangle2, Ball& ball, bool& gameOver)
 	{
+		if (pause)
+		{
+			if (keyboard.isKeyPressed(Keyboard::Escape))
+			{
+				returnToMenu(currentScreen, rectangle1, rectangle2, ball, gameOver);
+			}
+		}
 		if (keyboard.isKeyPressed(Keyboard::BackSpace))
 		{
 			pause = true;
@@ -409,10 +431,7 @@ namespace pong
 		{
 			pause = false;
 		}
-		if (keyboard.isKeyPressed(Keyboard::Escape))
-		{
-			returnToMenu(currentScreen, rectangle1, rectangle2, ball, gameOver);
-		}
+		
 	}
 
 	void resetGame(Pad& rectangle1, Pad& rectangle2, Ball& ball, bool& gameOver)
@@ -624,49 +643,93 @@ namespace pong
 		{
 			player2Won1.setCharacterSize(20);
 			player2Won1.setFillColor(Color::Blue);
-			player2Won1.setPosition(20, 420);
+			player2Won1.setPosition(static_cast<float>(GetScreenWidth() / 2) - 100, static_cast<float>(GetScreenHeight() / 2 - 20));
 			player2Won1.setString("Player 2 has won");
 			drawText(player2Won1);
 
 			player2Won2.setCharacterSize(20);
 			player2Won2.setFillColor(Color::Blue);
-			player2Won2.setPosition(20, 390);
+			player2Won2.setPosition(static_cast<float>(GetScreenWidth() / 2) - 100, static_cast<float>(GetScreenHeight() / 2));
 			player2Won2.setString("Press ESC to return to the menu");
 			drawText(player2Won2);
 
 			player2Won3.setCharacterSize(20);
 			player2Won3.setFillColor(Color::Blue);
-			player2Won3.setPosition(20, 370);
+			player2Won3.setPosition(static_cast<float>(GetScreenWidth() / 2) - 100, static_cast<float>(GetScreenHeight() / 2 + 20));
 			player2Won3.setString("or Enter to play again");
 			drawText(player2Won3);
 		}
 
 		if (pause)
 		{
-			pause1.setCharacterSize(40);
-			pause1.setFillColor(Color::Black);
-			pause1.setPosition(230, 270);
-			pause1.setString("PAUSED");
-			drawText(pause1);
-
-			pause2.setCharacterSize(40);
-			pause2.setFillColor(Color::Black);
-			pause2.setPosition(230, 230);
-			pause2.setString("Use ESC to go to the menu");
-			drawText(pause2);
-
-			pause3.setCharacterSize(40);
-			pause3.setFillColor(Color::Black);
-			pause3.setPosition(230, 190);
-			pause3.setString("or Enter to continue");
-			drawText(pause3);
-
-			pauseMenuSprite.setPosition(static_cast<float>(GetScreenWidth() / 2), static_cast<float>(GetScreenHeight() / 2));
+			pauseMenuSprite.setPosition(static_cast<float>((GetScreenWidth() / 2) - 200), static_cast<float>((GetScreenHeight() / 2) - 100));
 			pauseMenuSprite.setScale(1.0f, 1.0f);
 			window->draw(pauseMenuSprite);
 
+			pause1.setCharacterSize(20);
+			pause1.setFillColor(Color::Black);
+			pause1.setPosition(350, 140);
+			pause1.setString("PAUSED");
+			drawText(pause1);
+
+			pause2.setCharacterSize(20);
+			pause2.setFillColor(Color::Black);
+			pause2.setPosition(230, 200);
+			pause2.setString("Use ESC to go to the menu");
+			drawText(pause2);
+
+			pause3.setCharacterSize(20);
+			pause3.setFillColor(Color::Black);
+			pause3.setPosition(230, 220);
+			pause3.setString("or Enter to continue");
+			drawText(pause3);
+
+			
+
 			/*slSprite(textMenuPause, GetScreenWidth() / 2, GetScreenHeight() / 2, 400, 200);*/
 		}
+	}
+
+	void drawCredits()
+	{
+		Text credits1;
+		Text credits2;
+		Text credits3;
+		Text credits4;
+		Text credits5;
+
+		drawField();
+
+		credits1.setCharacterSize(20);
+		credits1.setFillColor(Color::Black);
+		credits1.setPosition(50, 20);
+		credits1.setString("Programmers: ");
+		drawText(credits1);
+
+		credits2.setCharacterSize(20);
+		credits2.setFillColor(Color::Black);
+		credits2.setPosition(50, 40);
+		credits2.setString("Joaquin Lendner and Ezequiel Prieto");
+		drawText(credits2);
+
+		credits3.setCharacterSize(20);
+		credits3.setFillColor(Color::Black);
+		credits3.setPosition(50, 80);
+		credits3.setString("Assets: ");
+		drawText(credits3);
+
+		credits4.setCharacterSize(20);
+		credits4.setFillColor(Color::Black);
+		credits4.setPosition(50, 100);
+		credits4.setString("Ezequiel Prieto");
+		drawText(credits4);
+
+		credits5.setCharacterSize(20);
+		credits5.setFillColor(Color::Black);
+		credits5.setPosition(50, 140);
+		credits5.setString("To return to the menu press ESC");
+		drawText(credits5);
+
 	}
 
 	void drawRules()
