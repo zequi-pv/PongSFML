@@ -3,14 +3,16 @@
 #include <iostream>
 
 using namespace std;
+using namespace sf;
 
 namespace pong {
 	struct Button
 	{
 		sf::Vector2f pos;
 		sf::Vector2f size;
-		string text;
 		sf::Color buttonColor;
-		sf::Color textColor;
+		bool isSelected;
 	};
+
+Button initButton();
 }

@@ -1,5 +1,8 @@
 #pragma once
 
-void runGame();
-int GetScreenHeight();
-int GetScreenWidth();
+namespace pong
+{
+	void runGame();
+	int GetScreenHeight();
+	int GetScreenWidth();
+}

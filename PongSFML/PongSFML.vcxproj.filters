@@ -33,11 +33,11 @@
     <ClCompile Include="..\src\elements\ball.cpp">
       <Filter>Objects</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\elements\Button.cpp">
+      <Filter>Objects</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Button.h">
-      <Filter>Archivos de encabezado</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\gameData\game.h">
       <Filter>Scenes</Filter>
     </ClInclude>
@@ -45,6 +45,9 @@
       <Filter>Objects</Filter>
     </ClInclude>
     <ClInclude Include="..\src\elements\ball.h">
+      <Filter>Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\elements\Button.h">
       <Filter>Objects</Filter>
     </ClInclude>
   </ItemGroup>

@@ -163,15 +163,16 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\src\elements\ball.cpp" />
+    <ClCompile Include="..\src\elements\Button.cpp" />
     <ClCompile Include="..\src\elements\pad.cpp" />
     <ClCompile Include="..\src\gameData\game.cpp" />
     <ClCompile Include="..\src\main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\elements\ball.h" />
+    <ClInclude Include="..\src\elements\Button.h" />
     <ClInclude Include="..\src\elements\pad.h" />
     <ClInclude Include="..\src\gameData\game.h" />
-    <ClInclude Include="Button.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
