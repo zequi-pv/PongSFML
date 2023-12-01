@@ -1,10 +1,10 @@
 #pragma once
 struct Ball
 {
-    double x;
-    double y;
-    double width;
-    double height;
+    float x;
+    float y;
+    float width;
+    float height;
     float speedY;
     float speedX;
 };

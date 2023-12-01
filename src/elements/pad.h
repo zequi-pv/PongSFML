@@ -3,10 +3,10 @@
 
 struct Pad
 {
-    double x;
-    double y;
-    double width;
-    double height;
+    float x;
+    float y;
+    float width;
+    float height;
     int score = 0;
     int minPosition;
     int maxPosition;

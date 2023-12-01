@@ -20,14 +20,20 @@ enum GameScreen
 	SINGLEPLAYER,
 	MULTIPLAYER,
 	RULES,
+	CREDITS,
 	EXIT
 };
 
 static void init(RenderWindow& window, Ball& ball, Pad& rectangle1, Pad& rectangle2, Pad& middleRectangle);
-static void PausedGame(bool& pause, GameScreen& currentScreen, Pad& rectangle1, Pad& rectangle2, Ball& ball, bool& gameOver);
+static void initTextures(Texture& texBall, Texture& texPadOne, Texture& texPadTwo,
+	Texture& texField, Texture& textMenuPause);
+static void initFont(Font font);
+static void initSprites(Sprite& ballSprite, Texture& texBall, Sprite& padOneSprite, Texture& texPadOne, Sprite& padTwoSprite, Texture& texPadTwo,
+	Sprite& fieldSprite, Texture& texField, Sprite& pauseMenuSprite, Texture& textMenuPause);
+static void PausedGame(Keyboard keyboard, bool& pause, GameScreen& currentScreen, Pad& rectangle1, Pad& rectangle2, Ball& ball, bool& gameOver);
 static void ResetGame(Pad& rectangle1, Pad& rectangle2, Ball& ball, bool& gameOver);
 static void drawGame(Ball& ball, Pad& rectangle1, Pad& rectangle2, Pad& middleRectangle, Texture texBall, Texture texPadOne, Texture texPadTwo, Texture texField, bool pause, int winPoints, Texture textMenuPause);
-static void drawRules(Texture texField);
+static void drawRules(Sprite fieldSprite);
 static void returnToMenu(GameScreen& currentScreen, Pad& rectangle1, Pad& rectangle2, Ball& ball, bool& gameOver);
 static void inputsSingle(Time& dt, Keyboard keyboard, Pad& rectangle1);
 static void updateSingleplayer(Time& dt, Keyboard keyboard, Ball& ball, Pad& rectangle1, Pad& rectangle2, GameScreen& currentScreen, bool& gameOver, int winPoints, bool& pause, int& currentOption);
@@ -37,7 +43,7 @@ static void close();
 
 void runGame()
 {
-	srand(time(NULL));
+	srand(static_cast<unsigned int>(time(NULL)));
 
 	RenderWindow window;
 
@@ -48,51 +54,59 @@ void runGame()
 	Keyboard keyboard;
 
 	Font font;
-	font.loadFromFile("res/fonts/BoaConstruktorBold.ttf");
 
-	Text text;
-	text.setFont(font);
-	text.setCharacterSize(30);
-	text.setStyle(sf::Text::Regular);
+	Texture texBall;
+	Texture texPadOne;
+	Texture texPadTwo;
+	Texture texField;
+	Texture textMenuPause;
+
+	Sprite ballSprite;
+	Sprite padOneSprite;
+	Sprite padTwoSprite;
+	Sprite fieldSprite;
+	Sprite pauseMenuSprite;
+
+	Text title1;
+	Text title2;
+	Text title3;
+
+	Text singlePlayer;
+	Text multiPlayer;
+	Text rules;
+	Text credits;
+	Text exit;
+
+	title1.setFont(font);
+	title1.setCharacterSize(30);
+	title1.setStyle(sf::Text::Regular);
 
 	Ball ball;
 	Pad rectangle1;
 	Pad rectangle2;
 	Pad middleRectangle;
-	bool gameOver = false;
-	bool pause = false;
+
+	GameScreen currentScreen = MENU;
 
 	init(window, ball, rectangle1, rectangle2, middleRectangle);
-
-	Texture texBall;
-	texBall.loadFromFile("assets/Ball.png");
-
-	Texture texPadOne;
-	texPadOne.loadFromFile("assets/PadTwo.png");
-
-	Texture texPadTwo;
-	texPadTwo.loadFromFile("assets/PadOne.png");
-
-	Texture texField;
-	texField.loadFromFile("assets/Field.png");
-
-	Texture textMenuPause;
-	textMenuPause.loadFromFile("assets/PauseMenu.png");
-
-	Texture texMenuLogo;
-	texMenuLogo.loadFromFile("assets/MenuLogo.png");
+	initTextures(texBall, texPadOne, texPadTwo, texField, textMenuPause);
+	initFont(font);
+	initSprites(ballSprite, texBall, padOneSprite, texPadOne, padTwoSprite, texPadTwo,
+		fieldSprite, texField, pauseMenuSprite, textMenuPause);
 
 	int initialDirection = rand() % 4 + 1;
 	int initialDirectionAgain = rand() % 2 + 1;
 	int currentOption = 0;
 	int firstOption = SINGLEPLAYER;
 	int lastOption = EXIT;
-	bool isGameRunning = true;
 	int winPoints = 5;
+
 	float timer;
 	float coolDownTime = 0.54f;
 
-	GameScreen currentScreen = MENU;
+	bool gameOver = false;
+	bool pause = false;
+	bool isGameRunning = true;
 
 	while (window.isOpen() && isGameRunning)
 	{
@@ -167,7 +181,7 @@ void runGame()
 			updateSingleplayer(dt, keyboard, ball, rectangle1, rectangle2, currentScreen, gameOver, winPoints, pause, currentOption);
 			break;
 		case MULTIPLAYER:
-			updateMultiplayer(dt, keyboard,ball, rectangle1, rectangle2, currentScreen, gameOver, winPoints, pause, currentOption);
+			updateMultiplayer(dt, keyboard, ball, rectangle1, rectangle2, currentScreen, gameOver, winPoints, pause, currentOption);
 			break;
 		case RULES:
 			if (keyboard.isKeyPressed(Keyboard::Escape))
@@ -188,78 +202,111 @@ void runGame()
 		switch (currentScreen)
 		{
 		case MENU:
-			slSetBackColor(0.0, 0.6, 0.0);
+
+			/*slSetBackColor(0.0, 0.6, 0.0);
 			slSetTextAlign(SL_ALIGN_CENTER);
 			slSetForeColor(1, 1, 1, 1);
-			slSprite(texField, 400, 225, 800, 450);
+			slSprite(texField, 400, 225, 800, 450);*/
 
-			slSetFontSize(50);
-			slSetForeColor(0, 0, 1, 1);
-			slText(400, 320, "SUPER");
-			slSetForeColor(1, 1, 0, 1);
-			slText(400, 270, "CHAMPION");
-			slSetForeColor(1, 0, 0, 1);
-			slText(400, 220, "PONG");
+			title1.setCharacterSize(50);
+			title1.setColor(Color::Blue);
+			title1.setPosition(400, 320);
+			title1.setString("SUPER");
 
-			slSetFontSize(20);
-			slSetForeColor(1, 1, 1, 1);
-			slText(170, 20, "Made by Ezequiel Prieto");
-			slText(400, 190, "SINGLE PLAYER");
-			slText(400, 170, "MULTI PLAYER");
-			slText(400, 150, "RULES");
-			slText(400, 130, "EXIT");
+			title2.setCharacterSize(50);
+			title2.setColor(Color::Yellow);
+			title2.setPosition(400, 270);
+			title2.setString("CHAMPION");
 
-			slText(600, 80, "Use the up and down keys ");
+			title3.setCharacterSize(50);
+			title3.setColor(Color::Red);
+			title3.setPosition(400, 220);
+			title3.setString("PONG");
+
+
+			singlePlayer.setCharacterSize(20);
+			singlePlayer.setColor(Color::White);
+			singlePlayer.setPosition(400, 190);
+			singlePlayer.setString("SINGLE PLAYER");
+
+			multiPlayer.setCharacterSize(20);
+			multiPlayer.setColor(Color::White);
+			multiPlayer.setPosition(400, 170);
+			multiPlayer.setString("MULTI PLAYER");
+
+			rules.setCharacterSize(20);
+			rules.setColor(Color::White);
+			rules.setPosition(400, 150);
+			rules.setString("RULES");
+
+			credits.setCharacterSize(20);
+			credits.setColor(Color::White);
+			credits.setPosition(400, 130);
+			credits.setString("CREDITS");
+
+			exit.setCharacterSize(20);
+			exit.setColor(Color::White);
+			exit.setPosition(400, 110);
+			exit.setString("EXIT");
+
+			//slText(170, 20, "Made by Ezequiel Prieto"); credits
+
+			/*slText(600, 80, "Use the up and down keys ");
 			slText(600, 50, "to move through the menu!");
 
-			slSetForeColor(1, 1, 1, 1);
+			slSetForeColor(1, 1, 1, 1);*/
 
 			switch (currentOption)
 			{
 			case SINGLEPLAYER:
-				slSetTextAlign(SL_ALIGN_CENTER);
-				slSetFontSize(20);
-				slSetForeColor(1, 0, 0, 1);
-				slText(400, 190, "SINGLE PLAYER");
+				singlePlayer.setCharacterSize(20);
+				singlePlayer.setColor(Color::Red);
+				singlePlayer.setPosition(400, 190);
+				singlePlayer.setString("SINGLE PLAYER");
 
 				break;
 			case MULTIPLAYER:
-				slSetTextAlign(SL_ALIGN_CENTER);
-				slSetFontSize(20);
-				slSetForeColor(1, 0, 0, 1);
-				slText(400, 170, "MULTI PLAYER");
+				multiPlayer.setCharacterSize(20);
+				multiPlayer.setColor(Color::Red);
+				multiPlayer.setPosition(400, 170);
+				multiPlayer.setString("MULTI PLAYER");
 
 				break;
 			case RULES:
-				slSetTextAlign(SL_ALIGN_CENTER);
-				slSetFontSize(20);
-				slSetForeColor(1, 0, 0, 1);
-				slText(400, 150, "RULES");
+				rules.setCharacterSize(20);
+				rules.setColor(Color::Red);
+				rules.setPosition(400, 150);
+				rules.setString("RULES");
 
 				break;
+
+			case CREDITS:
+				credits.setCharacterSize(20);
+				credits.setColor(Color::Red);
+				credits.setPosition(400, 130);
+				credits.setString("CREDITS");
+				break;
+
 			case EXIT:
-				slSetTextAlign(SL_ALIGN_CENTER);
-				slSetFontSize(20);
-				slSetForeColor(1, 0, 0, 1);
-				slText(400, 130, "EXIT");
-
-				break;
-			default:
+				exit.setCharacterSize(20);
+				exit.setColor(Color::Red);
+				exit.setPosition(400, 110);
+				exit.setString("EXIT");
 				break;
 			}
 
 			break;
 		case SINGLEPLAYER:
-			slSetBackColor(0.0, 0.600, 0.0);
+			window.clear(Color::White);
 			drawGame(ball, rectangle1, rectangle2, middleRectangle, texBall, texPadOne, texPadTwo, texField, pause, winPoints, textMenuPause);
 			break;
 		case MULTIPLAYER:
-			slSetBackColor(0.0, 0.600, 0.0);
+			window.clear(Color::White);
 			drawGame(ball, rectangle1, rectangle2, middleRectangle, texBall, texPadOne, texPadTwo, texField, pause, winPoints, textMenuPause);
 			break;
 		case RULES:
-			slSetBackColor(0.0, 0.0, 0.0);
-			drawRules(texField);
+			window.clear(Color::White);
+			drawRules(fieldSprite);
 			break;
 		case EXIT:
 			break;
@@ -285,17 +332,17 @@ int GetScreenHeight()
 	return screenHeight;
 }
 
-void PausedGame(bool& pause, GameScreen& currentScreen, Pad& rectangle1, Pad& rectangle2, Ball& ball, bool& gameOver)
+void PausedGame(Keyboard keyboard, bool& pause, GameScreen& currentScreen, Pad& rectangle1, Pad& rectangle2, Ball& ball, bool& gameOver)
 {
-	if (slGetKey(SL_KEY_BACKSPACE))
+	if (keyboard.isKeyPressed(Keyboard::BackSpace))
 	{
 		pause = true;
 	}
-	if (slGetKey(SL_KEY_ENTER))
+	if (keyboard.isKeyPressed(Keyboard::Enter))
 	{
 		pause = false;
 	}
-	if (pause && slGetKey(SL_KEY_ESCAPE))
+	if (keyboard.isKeyPressed(Keyboard::Escape))
 	{
 		returnToMenu(currentScreen, rectangle1, rectangle2, ball, gameOver);
 	}
@@ -369,6 +416,39 @@ void init(RenderWindow& window, Ball& ball, Pad& rectangle1, Pad& rectangle2, Pa
 
 }
 
+void initTextures(Texture& texBall, Texture& texPadOne, Texture& texPadTwo,
+	Texture& texField, Texture& textMenuPause)
+{
+	texBall.loadFromFile("assets/Ball.png");
+
+	texPadOne.loadFromFile("assets/PadTwo.png");
+
+	texPadTwo.loadFromFile("assets/PadOne.png");
+
+	texField.loadFromFile("assets/Field.png");
+
+	textMenuPause.loadFromFile("assets/PauseMenu.png");
+}
+
+void initSprites(Sprite& ballSprite, Texture& texBall, Sprite& padOneSprite, Texture& texPadOne, Sprite& padTwoSprite, Texture& texPadTwo,
+	Sprite& fieldSprite, Texture& texField, Sprite& pauseMenuSprite, Texture& textMenuPause)
+{
+	ballSprite.setTexture(texBall);
+
+	padOneSprite.setTexture(texPadOne);
+
+	padTwoSprite.setTexture(texPadTwo);
+
+	fieldSprite.setTexture(texField);
+
+	pauseMenuSprite.setTexture(textMenuPause);
+}
+
+void initFont(Font font)
+{
+	font.loadFromFile("res/fonts/BoaConstruktorBold.ttf");
+}
+
 void inputsSingle(Time& dt, Keyboard keyboard, Pad& rectangle1)
 {
 	if (keyboard.isKeyPressed(Keyboard::S)) rectangle1.y -= 250.0f * dt.asSeconds();
@@ -392,100 +472,155 @@ void drawGame(Ball& ball, Pad& rectangle1, Pad& rectangle2, Pad& middleRectangle
 	string textPoints1 = to_string(rectangle1.score);
 	string textPoints2 = to_string(rectangle2.score);
 
-	slSetForeColor(1, 1, 1, 1);
-	slSetTextAlign(SL_ALIGN_LEFT);
+	Text points1;
+	Text points2;
 
-	slSetFontSize(25);
+	Text returnTomenuKey;
 
-	slSprite(texField, 400, 225, 800, 450);
+	Text player1Won1;
+	Text player1Won2;
+	Text player1Won3;
 
-	slText(200, 400, textPoints1.c_str());
+	Text player2Won1;
+	Text player2Won2;
+	Text player2Won3;
 
-	slText(600, 400, textPoints2.c_str());
+	Text pause1;
+	Text pause2;
+	Text pause3;
 
-	slSetFontSize(20);
+	points1.setCharacterSize(25);
+	points1.setColor(Color::Black);
+	points1.setPosition(200, 400);
+	points1.setString(textPoints1.c_str());
 
-	slText(20, 20, "Press BackSpace to pause");
+	points2.setCharacterSize(25);
+	points2.setColor(Color::Black);
+	points2.setPosition(600, 400);
+	points2.setString(textPoints2.c_str());
 
-	slSprite(texBall, ball.x, ball.y, ball.width, ball.height);
+	returnTomenuKey.setCharacterSize(25);
+	returnTomenuKey.setColor(Color::Black);
+	returnTomenuKey.setPosition(20, 20);
+	returnTomenuKey.setString("Press BackSpace to pause");
+
+	/*slSprite(texField, 400, 225, 800, 450);*/
+
+	/*slSprite(texBall, ball.x, ball.y, ball.width, ball.height);
 
 	slSprite(texPadOne, rectangle1.x, rectangle1.y, rectangle1.width, rectangle1.height);
 
-	slSprite(texPadTwo, rectangle2.x, rectangle2.y, rectangle2.width, rectangle2.height);
+	slSprite(texPadTwo, rectangle2.x, rectangle2.y, rectangle2.width, rectangle2.height);*/
 
 	if (rectangle1.score == winPoints)
 	{
-		slSetTextAlign(SL_ALIGN_LEFT);
-		slSetForeColor(1, 0, 0, 1);
+		player1Won1.setCharacterSize(20);
+		player1Won1.setColor(Color::Red);
+		player1Won1.setPosition(20, 420);
+		player1Won1.setString("Player 1 has won");
 
-		slSetFontSize(20);
-		slText(20, 420, "Player 1 has won");
-		slSetForeColor(1, 1, 1, 1);
-		slText(20, 390, "Press ESC to return to the menu");
-		slText(20, 370, "or Enter to play again");
+		player1Won2.setCharacterSize(20);
+		player1Won2.setColor(Color::Red);
+		player1Won2.setPosition(20, 390);
+		player1Won2.setString("Press ESC to return to the menu");
+
+		player1Won3.setCharacterSize(20);
+		player1Won3.setColor(Color::Red);
+		player1Won3.setPosition(20, 370);
+		player1Won3.setString("or Enter to play again");
 	}
 
 	if (rectangle2.score == winPoints)
 	{
-		slSetTextAlign(SL_ALIGN_RIGHT);
-		slSetForeColor(1, 0, 0, 1);
+		player2Won1.setCharacterSize(20);
+		player2Won1.setColor(Color::Blue);
+		player2Won1.setPosition(20, 420);
+		player2Won1.setString("Player 2 has won");
 
-		slSetFontSize(20);
-		slText(600, 420, "Player 2 has won");
-		slSetForeColor(1, 1, 1, 1);
-		slText(800, 390, "Press enter to return to the menu");
-		slText(650, 370, "or Enter to play again");
+		player2Won2.setCharacterSize(20);
+		player2Won2.setColor(Color::Blue);
+		player2Won2.setPosition(20, 390);
+		player2Won2.setString("Press ESC to return to the menu");
+
+		player2Won3.setCharacterSize(20);
+		player2Won3.setColor(Color::Blue);
+		player2Won3.setPosition(20, 370);
+		player2Won3.setString("or Enter to play again");
 	}
 
 	if (pause)
 	{
-		slSetTextAlign(SL_ALIGN_LEFT);
-		slSetForeColor(0, 0, 0, 1);
+		pause1.setCharacterSize(40);
+		pause1.setColor(Color::Black);
+		pause1.setPosition(230, 270);
+		pause1.setString("PAUSED");
 
-		slSetForeColor(1, 1, 1, 1);
-		slSprite(textMenuPause, GetScreenWidth() / 2, GetScreenHeight() / 2, 400, 200);
-		slSetForeColor(0, 0, 0, 1);
-		slSetFontSize(40);
-		slText(230, 270, "PAUSED");
-		slSetFontSize(20);
-		slText(230, 230, "Use ESC to go to the menu");
-		slText(230, 190, "or Enter to continue");
+		pause2.setCharacterSize(40);
+		pause2.setColor(Color::Black);
+		pause2.setPosition(230, 230);
+		pause2.setString("Use ESC to go to the menu");
+
+		pause3.setCharacterSize(40);
+		pause3.setColor(Color::Black);
+		pause3.setPosition(230, 190);
+		pause3.setString("or Enter to continue");
+
+		/*slSprite(textMenuPause, GetScreenWidth() / 2, GetScreenHeight() / 2, 400, 200);*/
 	}
 }
 
-void drawRules(Texture texField)
+void drawRules(Sprite fieldSprite)
 {
-	slSetBackColor(0.0, 0.0, 0.0);
+	Text rules1;
+	Text rules2;
+	Text rules3;
+	Text rules4;
+	Text rules5;
+	Text rules6;
 
-	slSprite(texField, 400, 225, 800, 450);
+	/*slSetBackColor(0.0, 0.0, 0.0);*/
 
-	slSetTextAlign(SL_ALIGN_LEFT);
+	/*slSprite(texField, 400, 225, 800, 450);*/
 
-	slSetFontSize(20);
+	rules1.setCharacterSize(20);
+	rules1.setColor(Color::White);
+	rules1.setPosition(20, 430);
+	rules1.setString("- Player 1 has to move the left pad up and down with");
 
-	slSetForeColor(1, 1, 1, 1);
+	rules2.setCharacterSize(20);
+	rules2.setColor(Color::White);
+	rules2.setPosition(20, 410);
+	rules2.setString("   the W and S keys.");
 
-	slText(20, 430, "- Player 1 has to move the left pad up and down with");
+	rules3.setCharacterSize(20);
+	rules3.setColor(Color::White);
+	rules3.setPosition(20, 390);
+	rules3.setString("- Player 2 has to move the right pad up and down with the up and");
 
-	slText(20, 410, "   the W and S keys.");
+	rules4.setCharacterSize(20);
+	rules4.setColor(Color::White);
+	rules4.setPosition(20, 370);
+	rules4.setString("   down keys.");
 
-	slText(20, 390, "- Player 2 has to move the right pad up and down with the up and");
+	rules5.setCharacterSize(20);
+	rules5.setColor(Color::White);
+	rules5.setPosition(20, 350);
+	rules5.setString("- The first one getting five points wins.");
 
-	slText(20, 370, "   down keys.");
-
-	slText(20, 350, "- The first one getting five points wins.");
-
-	slText(20, 330, "To ESC to the menu press enter.");
+	rules6.setCharacterSize(20);
+	rules6.setColor(Color::White);
+	rules6.setPosition(20, 330);
+	rules6.setString("To return to the menu press enter.");
 
 }
 
 void updateSingleplayer(Time& dt, Keyboard keyboard, Ball& ball, Pad& rectangle1, Pad& rectangle2, GameScreen& currentScreen, bool& gameOver, int winPoints, bool& pause, int& currentOption)
 {
-	PausedGame(pause, currentScreen, rectangle1, rectangle2, ball, gameOver);
+	PausedGame(keyboard, pause, currentScreen, rectangle1, rectangle2, ball, gameOver);
 
 	if (!gameOver && !pause)
 	{
-		inputsSingle(rectangle1);
+		inputsSingle(dt, keyboard, rectangle1);
 
 		ball.x += ball.speedX * dt.asSeconds();
 		ball.y += ball.speedY * dt.asSeconds();
@@ -572,11 +707,11 @@ void updateSingleplayer(Time& dt, Keyboard keyboard, Ball& ball, Pad& rectangle1
 
 void updateMultiplayer(Time& dt, Keyboard keyboard, Ball& ball, Pad& rectangle1, Pad& rectangle2, GameScreen& currentScreen, bool& gameOver, int winPoints, bool& pause, int& currentOption)
 {
-	PausedGame(pause, currentScreen, rectangle1, rectangle2, ball, gameOver);
+	PausedGame(keyboard, pause, currentScreen, rectangle1, rectangle2, ball, gameOver);
 
 	if (!gameOver && !pause)
 	{
-		inputsMulti(rectangle1, rectangle2);
+		inputsMulti(dt, keyboard, rectangle1, rectangle2);
 
 		ball.x += ball.speedX * dt.asSeconds();
 		ball.y += ball.speedY * dt.asSeconds();

@@ -1,5 +1,3 @@
-#include "sl.h"
-
 #include "gameData/game.h"
 #include "Ball.h"
 

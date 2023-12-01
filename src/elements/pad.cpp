@@ -7,8 +7,8 @@ const int height = 113;
 
 void initPad1(Pad& pad)
 {
-	pad.x = GetScreenWidth() / 10.0f;
-	pad.y = GetScreenHeight() / 2.0f;
+	pad.x = static_cast<float>(GetScreenWidth()) / 10.0f;
+	pad.y = static_cast<float>(GetScreenHeight()) / 2.0f;
 	pad.width = width;
 	pad.height = height;
 	pad.minPosition = pad.height / 2;
