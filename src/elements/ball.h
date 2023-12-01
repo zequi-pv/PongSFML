@@ -3,8 +3,8 @@ struct Ball
 {
     float x;
     float y;
-    float width;
-    float height;
+    int width;
+    int height;
     float speedY;
     float speedX;
 };

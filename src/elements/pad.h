@@ -5,9 +5,9 @@ struct Pad
 {
     float x;
     float y;
-    float width;
-    float height;
-    int score = 0;
+    int width;
+    int height;
+    int score;
     int minPosition;
     int maxPosition;
 };

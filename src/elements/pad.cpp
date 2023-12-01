@@ -2,7 +2,7 @@
 #include "Ball.h"
 #include "gameData/Game.h"
 
-const int width = 26.5;
+const int width = 26;
 const int height = 113;
 
 void initPad1(Pad& pad)
@@ -11,6 +11,7 @@ void initPad1(Pad& pad)
 	pad.y = static_cast<float>(GetScreenHeight()) / 2.0f;
 	pad.width = width;
 	pad.height = height;
+	pad.score = 0;
 	pad.minPosition = pad.height / 2;
 	pad.maxPosition = GetScreenHeight() - pad.height / 2;
 	Limit(pad);
@@ -22,6 +23,7 @@ void initPad2(Pad& pad)
 	pad.y = GetScreenHeight() / 2.0f;
 	pad.width = width;
 	pad.height = height;
+	pad.score = 0;
 	pad.minPosition = pad.height / 2;
 	pad.maxPosition = GetScreenHeight() - pad.height / 2;
 	Limit(pad);
@@ -31,11 +33,11 @@ void Limit(Pad& rectangle)
 {
 	if (rectangle.y - rectangle.height / 2 <= 0)
 	{
-		rectangle.y = rectangle.minPosition;
+		rectangle.y = static_cast<float>(rectangle.minPosition);
 	}
 	else if (rectangle.y + rectangle.height / 2 >= GetScreenHeight())
 	{
-		rectangle.y = rectangle.maxPosition;
+		rectangle.y = static_cast<float>(rectangle.maxPosition);
 	}
 }
 

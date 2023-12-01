@@ -164,7 +164,6 @@
     <ClCompile Include="..\src\elements\pad.cpp" />
     <ClCompile Include="..\src\gameData\game.cpp" />
     <ClCompile Include="..\src\main.cpp" />
-    <ClCompile Include="Main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\elements\ball.h" />
