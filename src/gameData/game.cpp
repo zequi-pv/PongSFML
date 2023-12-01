@@ -24,22 +24,31 @@ enum GameScreen
 	EXIT
 };
 
+Sprite ballSprite;
+Sprite padOneSprite;
+Sprite padTwoSprite;
+Sprite fieldSprite;
+Sprite pauseMenuSprite;
+
 static void init(RenderWindow& window, Ball& ball, Pad& rectangle1, Pad& rectangle2);
 static void initTextures(Texture& texBall, Texture& texPadOne, Texture& texPadTwo,
 	Texture& texField, Texture& textMenuPause);
 static void initFont(Font font);
-static void initSprites(Sprite& ballSprite, Texture& texBall, Sprite& padOneSprite, Texture& texPadOne, Sprite& padTwoSprite, Texture& texPadTwo,
-	Sprite& fieldSprite, Texture& texField, Sprite& pauseMenuSprite, Texture& textMenuPause);
-static void PausedGame(Keyboard keyboard, bool& pause, GameScreen& currentScreen, Pad& rectangle1, Pad& rectangle2, Ball& ball, bool& gameOver);
-static void ResetGame(Pad& rectangle1, Pad& rectangle2, Ball& ball, bool& gameOver);
-static void drawGame(Ball& ball, Pad& rectangle1, Pad& rectangle2, Texture texBall, Texture texPadOne, Texture texPadTwo, Texture texField, bool pause, int winPoints, Texture textMenuPause);
-static void drawRules(Sprite fieldSprite);
+static void initSprites(Texture& texBall, Texture& texPadOne, Texture& texPadTwo,
+	Texture& texField, Texture& textMenuPause);
+static void pausedGame(Keyboard keyboard, bool& pause, GameScreen& currentScreen, Pad& rectangle1, Pad& rectangle2, Ball& ball, bool& gameOver);
+static void resetGame(Pad& rectangle1, Pad& rectangle2, Ball& ball, bool& gameOver);
+static void drawField(RenderWindow& window);
+static void drawObjects(RenderWindow& window, Ball ball, Pad rectangle1, Pad rectangle2);
+static void drawGame(RenderWindow& window, Ball& ball, Pad& rectangle1, Pad& rectangle2, bool pause, int winPoints);
+static void drawRules(RenderWindow& window);
 static void returnToMenu(GameScreen& currentScreen, Pad& rectangle1, Pad& rectangle2, Ball& ball, bool& gameOver);
 static void inputsSingle(Time& dt, Keyboard keyboard, Pad& rectangle1);
-static void updateSingleplayer(Time& dt, Keyboard keyboard, Ball& ball, Pad& rectangle1, Pad& rectangle2, GameScreen& currentScreen, bool& gameOver, int winPoints, bool& pause, int& currentOption);
+static void updateSingleplayer(Time& dt, Keyboard keyboard, Ball& ball, Pad& rectangle1, Pad& rectangle2, GameScreen& currentScreen,
+	bool& gameOver, int winPoints, bool& pause, int& currentOption);
 static void inputsMulti(Time& dt, Keyboard keyboard, Pad& rectangle1, Pad& rectangle2);
-static void updateMultiplayer(Time& dt, Keyboard keyboard, Ball& ball, Pad& rectangle1, Pad& rectangle2, GameScreen& currentScreen, bool& gameOver, int winPoints, bool& pause, int& currentOption);
-static void close();
+static void updateMultiplayer(Time& dt, Keyboard keyboard, Ball& ball, Pad& rectangle1, Pad& rectangle2, GameScreen& currentScreen,
+	bool& gameOver, int winPoints, bool& pause, int& currentOption);
 
 void runGame()
 {
@@ -60,12 +69,6 @@ void runGame()
 	Texture texPadTwo;
 	Texture texField;
 	Texture textMenuPause;
-
-	Sprite ballSprite;
-	Sprite padOneSprite;
-	Sprite padTwoSprite;
-	Sprite fieldSprite;
-	Sprite pauseMenuSprite;
 
 	Text title1;
 	Text title2;
@@ -90,8 +93,7 @@ void runGame()
 	init(window, ball, rectangle1, rectangle2);
 	initTextures(texBall, texPadOne, texPadTwo, texField, textMenuPause);
 	initFont(font);
-	initSprites(ballSprite, texBall, padOneSprite, texPadOne, padTwoSprite, texPadTwo,
-		fieldSprite, texField, pauseMenuSprite, textMenuPause);
+	initSprites(texBall, texPadOne, texPadTwo, texField, textMenuPause);
 
 	/*int initialDirection = rand() % 4 + 1;
 	int initialDirectionAgain = rand() % 2 + 1;*/
@@ -204,8 +206,9 @@ void runGame()
 
 			/*slSetBackColor(0.0, 0.6, 0.0);
 			slSetTextAlign(SL_ALIGN_CENTER);
-			slSetForeColor(1, 1, 1, 1);
-			slSprite(texField, 400, 225, 800, 450);*/
+			slSetForeColor(1, 1, 1, 1);*/
+
+			drawField(window);
 
 			title1.setCharacterSize(50);
 			title1.setFillColor(Color::Blue);
@@ -248,7 +251,7 @@ void runGame()
 			exit.setPosition(400, 110);
 			exit.setString("EXIT");
 
-			//slText(170, 20, "Made by Ezequiel Prieto"); credits
+
 
 			/*slText(600, 80, "Use the up and down keys ");
 			slText(600, 50, "to move through the menu!");
@@ -297,15 +300,18 @@ void runGame()
 			break;
 		case SINGLEPLAYER:
 			window.clear(Color::White);
-			drawGame(ball, rectangle1, rectangle2, texBall, texPadOne, texPadTwo, texField, pause, winPoints, textMenuPause);
+			drawGame(window, ball, rectangle1, rectangle2, pause, winPoints);
 			break;
 		case MULTIPLAYER:
 			window.clear(Color::White);
-			drawGame(ball, rectangle1, rectangle2, texBall, texPadOne, texPadTwo, texField, pause, winPoints, textMenuPause);
+			drawGame(window, ball, rectangle1, rectangle2, pause, winPoints);
 			break;
 		case RULES:
 			window.clear(Color::White);
-			drawRules(fieldSprite);
+			drawRules(window);
+			break;
+		case CREDITS:
+			//slText(170, 20, "Made by Ezequiel Prieto"); credits
 			break;
 		case EXIT:
 			break;
@@ -316,7 +322,7 @@ void runGame()
 		window.display();
 	}
 
-	close();
+	window.close();
 }
 
 int GetScreenWidth()
@@ -331,7 +337,7 @@ int GetScreenHeight()
 	return screenHeight;
 }
 
-void PausedGame(Keyboard keyboard, bool& pause, GameScreen& currentScreen, Pad& rectangle1, Pad& rectangle2, Ball& ball, bool& gameOver)
+void pausedGame(Keyboard keyboard, bool& pause, GameScreen& currentScreen, Pad& rectangle1, Pad& rectangle2, Ball& ball, bool& gameOver)
 {
 	if (keyboard.isKeyPressed(Keyboard::BackSpace))
 	{
@@ -347,7 +353,7 @@ void PausedGame(Keyboard keyboard, bool& pause, GameScreen& currentScreen, Pad& 
 	}
 }
 
-void ResetGame(Pad& rectangle1, Pad& rectangle2, Ball& ball, bool& gameOver)
+void resetGame(Pad& rectangle1, Pad& rectangle2, Ball& ball, bool& gameOver)
 {
 	gameOver = false;
 	rectangle1.score = 0;
@@ -359,7 +365,7 @@ void ResetGame(Pad& rectangle1, Pad& rectangle2, Ball& ball, bool& gameOver)
 
 void returnToMenu(GameScreen& currentScreen, Pad& rectangle1, Pad& rectangle2, Ball& ball, bool& gameOver)
 {
-	ResetGame(rectangle1, rectangle2, ball, gameOver);
+	resetGame(rectangle1, rectangle2, ball, gameOver);
 	currentScreen = GameScreen::MENU;
 }
 
@@ -412,19 +418,19 @@ void init(RenderWindow& window, Ball& ball, Pad& rectangle1, Pad& rectangle2)
 void initTextures(Texture& texBall, Texture& texPadOne, Texture& texPadTwo,
 	Texture& texField, Texture& textMenuPause)
 {
-	texBall.loadFromFile("assets/Ball.png");
+	texBall.loadFromFile("res/assets/Ball.png");
 
-	texPadOne.loadFromFile("assets/PadTwo.png");
+	texPadOne.loadFromFile("res/assets/PadTwo.png");
 
-	texPadTwo.loadFromFile("assets/PadOne.png");
+	texPadTwo.loadFromFile("res/assets/PadOne.png");
 
-	texField.loadFromFile("assets/Field.png");
+	texField.loadFromFile("res/assets/Field.png");
 
-	textMenuPause.loadFromFile("assets/PauseMenu.png");
+	textMenuPause.loadFromFile("res/assets/PauseMenu.png");
 }
 
-void initSprites(Sprite& ballSprite, Texture& texBall, Sprite& padOneSprite, Texture& texPadOne, Sprite& padTwoSprite, Texture& texPadTwo,
-	Sprite& fieldSprite, Texture& texField, Sprite& pauseMenuSprite, Texture& textMenuPause)
+void initSprites(Texture& texBall, Texture& texPadOne, Texture& texPadTwo,
+	Texture& texField, Texture& textMenuPause)
 {
 	ballSprite.setTexture(texBall);
 
@@ -460,7 +466,29 @@ void inputsMulti(Time& dt, Keyboard keyboard, Pad& rectangle1, Pad& rectangle2)
 	if (keyboard.isKeyPressed(Keyboard::Up)) rectangle2.y += 250.0f * dt.asSeconds();
 }
 
-void drawGame(Ball& ball, Pad& rectangle1, Pad& rectangle2, Texture texBall, Texture texPadOne, Texture texPadTwo, Texture texField, bool pause, int winPoints, Texture textMenuPause)
+void drawField(RenderWindow& window)
+{
+	fieldSprite.setPosition(400.0f, 225.0f);
+	fieldSprite.setScale(800.0f, 450.0f);
+	window.draw(fieldSprite);
+}
+
+void drawObjects(RenderWindow& window, Ball ball, Pad rectangle1, Pad rectangle2)
+{
+	ballSprite.setPosition(ball.x, ball.y);
+	ballSprite.setScale(static_cast<float>(ball.width), static_cast<float>(ball.height));
+	window.draw(ballSprite);
+
+	padOneSprite.setPosition(rectangle1.x, rectangle1.y);
+	padOneSprite.setScale(static_cast<float>(rectangle1.width), static_cast<float>(rectangle1.height));
+	window.draw(padOneSprite);
+
+	padTwoSprite.setPosition(rectangle2.x, rectangle2.y);
+	padTwoSprite.setScale(static_cast<float>(rectangle2.width), static_cast<float>(rectangle2.height));
+	window.draw(padTwoSprite);
+}
+
+void drawGame(RenderWindow& window, Ball& ball, Pad& rectangle1, Pad& rectangle2, bool pause, int winPoints)
 {
 	string textPoints1 = to_string(rectangle1.score);
 	string textPoints2 = to_string(rectangle2.score);
@@ -497,13 +525,9 @@ void drawGame(Ball& ball, Pad& rectangle1, Pad& rectangle2, Texture texBall, Tex
 	returnTomenuKey.setPosition(20, 20);
 	returnTomenuKey.setString("Press BackSpace to pause");
 
-	/*slSprite(texField, 400, 225, 800, 450);*/
+	drawField(window);
 
-	/*slSprite(texBall, ball.x, ball.y, ball.width, ball.height);
-
-	slSprite(texPadOne, rectangle1.x, rectangle1.y, rectangle1.width, rectangle1.height);
-
-	slSprite(texPadTwo, rectangle2.x, rectangle2.y, rectangle2.width, rectangle2.height);*/
+	drawObjects(window, ball, rectangle1, rectangle2);
 
 	if (rectangle1.score == winPoints)
 	{
@@ -562,7 +586,7 @@ void drawGame(Ball& ball, Pad& rectangle1, Pad& rectangle2, Texture texBall, Tex
 	}
 }
 
-void drawRules(Sprite fieldSprite)
+void drawRules(RenderWindow& window)
 {
 	Text rules1;
 	Text rules2;
@@ -573,7 +597,7 @@ void drawRules(Sprite fieldSprite)
 
 	/*slSetBackColor(0.0, 0.0, 0.0);*/
 
-	/*slSprite(texField, 400, 225, 800, 450);*/
+	drawField(window);
 
 	rules1.setCharacterSize(20);
 	rules1.setFillColor(Color::White);
@@ -609,7 +633,7 @@ void drawRules(Sprite fieldSprite)
 
 void updateSingleplayer(Time& dt, Keyboard keyboard, Ball& ball, Pad& rectangle1, Pad& rectangle2, GameScreen& currentScreen, bool& gameOver, int winPoints, bool& pause, int& currentOption)
 {
-	PausedGame(keyboard, pause, currentScreen, rectangle1, rectangle2, ball, gameOver);
+	pausedGame(keyboard, pause, currentScreen, rectangle1, rectangle2, ball, gameOver);
 
 	if (!gameOver && !pause)
 	{
@@ -677,7 +701,7 @@ void updateSingleplayer(Time& dt, Keyboard keyboard, Ball& ball, Pad& rectangle1
 		}
 		if (keyboard.isKeyPressed(Keyboard::Enter))
 		{
-			ResetGame(rectangle1, rectangle2, ball, gameOver);
+			resetGame(rectangle1, rectangle2, ball, gameOver);
 		}
 	}
 
@@ -692,7 +716,7 @@ void updateSingleplayer(Time& dt, Keyboard keyboard, Ball& ball, Pad& rectangle1
 		}
 		if (keyboard.isKeyPressed(Keyboard::Enter))
 		{
-			ResetGame(rectangle1, rectangle2, ball, gameOver);
+			resetGame(rectangle1, rectangle2, ball, gameOver);
 		}
 	}
 
@@ -700,7 +724,7 @@ void updateSingleplayer(Time& dt, Keyboard keyboard, Ball& ball, Pad& rectangle1
 
 void updateMultiplayer(Time& dt, Keyboard keyboard, Ball& ball, Pad& rectangle1, Pad& rectangle2, GameScreen& currentScreen, bool& gameOver, int winPoints, bool& pause, int& currentOption)
 {
-	PausedGame(keyboard, pause, currentScreen, rectangle1, rectangle2, ball, gameOver);
+	pausedGame(keyboard, pause, currentScreen, rectangle1, rectangle2, ball, gameOver);
 
 	if (!gameOver && !pause)
 	{
@@ -761,7 +785,7 @@ void updateMultiplayer(Time& dt, Keyboard keyboard, Ball& ball, Pad& rectangle1,
 		}
 		if (keyboard.isKeyPressed(Keyboard::Enter))
 		{
-			ResetGame(rectangle1, rectangle2, ball, gameOver);
+			resetGame(rectangle1, rectangle2, ball, gameOver);
 		}
 	}
 
@@ -771,19 +795,14 @@ void updateMultiplayer(Time& dt, Keyboard keyboard, Ball& ball, Pad& rectangle1,
 
 		if (keyboard.isKeyPressed(Keyboard::Escape))
 		{
-			ResetGame(rectangle1, rectangle2, ball, gameOver);
+			resetGame(rectangle1, rectangle2, ball, gameOver);
 			currentOption = 0;
 			currentScreen = GameScreen::MENU;
 		}
 
 		if (keyboard.isKeyPressed(Keyboard::Enter))
 		{
-			ResetGame(rectangle1, rectangle2, ball, gameOver);
+			resetGame(rectangle1, rectangle2, ball, gameOver);
 		}
 	}
-}
-
-void close()
-{
-
 }
