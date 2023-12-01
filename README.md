@@ -4,10 +4,12 @@ Hello I'm Ezequiel Prieto and with my classmate Joaquin Lendnerwe remade my pong
 ## Player 1 controls:
 
 UP	KEY W
+
 DOWN	KEY S
 ## Player 2 controls:
 
 UP	KEY UP
+
 DOWN	KEY DOWN
 ## Credits:
 
